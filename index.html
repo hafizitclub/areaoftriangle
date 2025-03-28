@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triangle Area Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+      color: #333;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      color: #1f2937;
+      margin-bottom: 20px;
+    }
+    .game-container {
+      background: white;
+      border: 2px dashed #1d4ed8;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+      display: inline-block;
+      max-width: 500px;
+    }
+    .triangle-svg {
+      display: block;
+      margin: 20px auto;
+      width: 400px;
+      height: 300px;
+    }
+    input[type="number"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 150px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.3s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]:focus {
+      border-color: #1d4ed8;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #1d4ed8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
+    .feedback {
+      font-weight: bold;
+      margin-top: 12px;
+      font-size: 1rem;
+    }
+    .score {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <h1>Triangle Area Game</h1>
+  <div class="game-container">
+    <svg class="triangle-svg" viewBox="0 0 400 300">
+      <polygon id="triangle" fill="#cce5ff" stroke="#333" stroke-width="2" />
+      <text id="baseLabel" x="0" y="0" font-size="14" fill="#000"></text>
+      <text id="heightLabel" x="0" y="0" font-size="14" fill="#000"></text>
+      <rect id="rightAngle" width="10" height="10" fill="#333" visibility="hidden" />
+    </svg>
+    <p>Calculate the area of the triangle:</p>
+    <input type="number" id="answer" placeholder="Enter area" />
+    <button onclick="checkAnswer()">Submit</button>
+    <p class="feedback" id="feedback"></p>
+    <div class="score">Score: <span id="score">0</span></div>
+  </div>
+
+  <script>
+    let base = 0;
+    let height = 0;
+    let score = 0;
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateTriangle() {
+      base = getRandomInt(1, 20);
+      height = getRandomInt(1, 20);
+      const orientation = getRandomInt(0, 3);
+
+      const scaledBase = base * 12;
+      const scaledHeight = height * 8;
+
+      let points = "";
+      let baseLabelX, baseLabelY, heightLabelX, heightLabelY;
+      let rightAngleX = 0, rightAngleY = 0;
+
+      const triangle = document.getElementById("triangle");
+      const baseLabel = document.getElementById("baseLabel");
+      const heightLabel = document.getElementById("heightLabel");
+      const rightAngle = document.getElementById("rightAngle");
+
+      if (orientation === 0) {
+        const x1 = 100, y1 = 250;
+        const x2 = x1 + scaledBase, y2 = 250;
+        const x3 = x1, y3 = y1 - scaledHeight;
+        points = `${x1},${y1} ${x2},${y2} ${x3},${y3}`;
+        baseLabelX = (x1 + x2) / 2 - 10;
+        baseLabelY = y1 + 20;
+        heightLabelX = x1 - 35;
+        heightLabelY = (y1 + y3) / 2;
+        rightAngleX = x1;
+        rightAngleY = y1 - 10;
+      } else if (orientation === 1) {
+        const x1 = 100, y1 = 50;
+        const x2 = x1 + scaledBase, y2 = 50;
+        const x3 = x1, y3 = y1 + scaledHeight;
+        points = `${x1},${y1} ${x2},${y2} ${x3},${y3}`;
+        baseLabelX = (x1 + x2) / 2 - 10;
+        baseLabelY = y1 - 10;
+        heightLabelX = x1 - 35;
+        heightLabelY = (y1 + y3) / 2;
+        rightAngleX = x1;
+        rightAngleY = y1;
+      } else if (orientation === 2) {
+        const x1 = 250, y1 = 250;
+        const x2 = x1, y2 = y1 - scaledHeight;
+        const x3 = x1 - scaledBase, y3 = y1;
+        points = `${x1},${y1} ${x2},${y2} ${x3},${y3}`;
+        baseLabelX = (x1 + x3) / 2;
+        baseLabelY = y1 + 20;
+        heightLabelX = x1 + 10;
+        heightLabelY = (y1 + y2) / 2;
+        rightAngleX = x1 - 10;
+        rightAngleY = y1 - 10;
+      } else {
+        const x1 = 100, y1 = 250;
+        const x2 = x1, y2 = y1 - scaledHeight;
+        const x3 = x1 + scaledBase, y3 = y1;
+        points = `${x1},${y1} ${x2},${y2} ${x3},${y3}`;
+        baseLabelX = (x1 + x3) / 2 - 10;
+        baseLabelY = y1 + 20;
+        heightLabelX = x1 - 35;
+        heightLabelY = (y1 + y2) / 2;
+        rightAngleX = x1;
+        rightAngleY = y1 - 10;
+      }
+
+      triangle.setAttribute("points", points);
+
+      baseLabel.setAttribute("x", baseLabelX);
+      baseLabel.setAttribute("y", baseLabelY);
+      baseLabel.textContent = `${base} m`;
+
+      heightLabel.setAttribute("x", heightLabelX);
+      heightLabel.setAttribute("y", heightLabelY);
+      heightLabel.textContent = `${height} m`;
+
+      rightAngle.setAttribute("x", rightAngleX);
+      rightAngle.setAttribute("y", rightAngleY);
+      rightAngle.setAttribute("visibility", "visible");
+
+      document.getElementById("answer").value = "";
+      document.getElementById("feedback").textContent = "";
+    }
+
+    function checkAnswer() {
+      const userAnswer = parseFloat(document.getElementById("answer").value);
+      const correctAnswer = 0.5 * base * height;
+
+      if (Math.abs(userAnswer - correctAnswer) < 0.01) {
+        score++;
+        document.getElementById("feedback").textContent = "✅ Correct! New triangle...";
+        document.getElementById("score").textContent = score;
+        setTimeout(generateTriangle, 1000);
+      } else {
+        document.getElementById("feedback").textContent = "❌ Try again.";
+      }
+    }
+
+    document.getElementById("answer").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        checkAnswer();
+      }
+    });
+
+    generateTriangle();
+  </script>
+</body>
+</html>
